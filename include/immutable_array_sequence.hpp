@@ -13,9 +13,9 @@ public:
     ImmutableArraySequence() : array(new DynamicArray<T>(0)) {}
     ImmutableArraySequence(T* items, int count) : array(new DynamicArray<T>(items, count)) {}
     ImmutableArraySequence(const ImmutableArraySequence<T>& other) : array(new DynamicArray<T>(*other.array)) {}  
-
-    //
-    ImmutableArraySequence(const LinkedList<T>& list) : array(new DynamicArray<T>(list.GetLength())) {
+    
+    ImmutableArraySequence(const LinkedList<T>& list) 
+    : array(new DynamicArray<T>(list.GetLength())) {
         for(int i=0; i<list.GetLength(); i++) {
             array->Set(i, list.Get(i));
         }
@@ -43,7 +43,6 @@ public:
     int GetLength() const override { 
         return array->GetSize(); 
     }
-
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
         if(startIndex<0 || endIndex>=array->GetSize() || startIndex>endIndex)

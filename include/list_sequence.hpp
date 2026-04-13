@@ -9,9 +9,14 @@ private:
     LinkedList<T>* list;  
 public:
     ListSequence() : list(new LinkedList<T>()) {}
-    ListSequence(T* items, int count) : list(new LinkedList<T>(items, count)) {}
-    ListSequence(const ListSequence<T>& other) : list(new LinkedList<T>(*other.list)) {}  
-    ListSequence(const LinkedList<T>& sourceList) : list(new LinkedList<T>(sourceList)) {}
+    ListSequence(T* items, int count) 
+    : list(new LinkedList<T>(items, count)) {}
+
+    ListSequence(const ListSequence<T>& other) 
+    : list(new LinkedList<T>(*other.list)) {}  
+
+    ListSequence(const LinkedList<T>& sourceList) 
+    : list(new LinkedList<T>(sourceList)) {}
 
     ~ListSequence() {
         delete list;  

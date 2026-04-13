@@ -9,6 +9,7 @@ private:
     int size; 
     
 public:
+    DynamicArray() : data(nullptr), size(0) {}
     DynamicArray(T* items, int count) : data(nullptr), size(0)  { 
         if(count < 0) {
             throw std::invalid_argument("DynamicArray: size cannot be negative");

@@ -9,9 +9,14 @@ private:
     LinkedList<T>* list;  
 public:
     ImmutableListSequence() : list(new LinkedList<T>()) {}
-    ImmutableListSequence(T* items, int count) : list(new LinkedList<T>(items, count)) {}
-    ImmutableListSequence(const ImmutableListSequence<T>& other) : list(new LinkedList<T>(*other.list)) {}  
-    ImmutableListSequence(const LinkedList<T>& sourceList) : list(new LinkedList<T>(sourceList)) {}
+    ImmutableListSequence(T* items, int count) 
+    : list(new LinkedList<T>(items, count)) {}
+
+    ImmutableListSequence(const ImmutableListSequence<T>& other) 
+    : list(new LinkedList<T>(*other.list)) {}  
+
+    ImmutableListSequence(const LinkedList<T>& sourceList) 
+    : list(new LinkedList<T>(sourceList)) {}
 
     ~ImmutableListSequence() {
         delete list;  

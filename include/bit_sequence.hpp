@@ -222,4 +222,13 @@ public:
     }
     //
 
+    // В public секции класса BitSequence:
+
+    void SetBit(int index, bool value) {
+        if (index<0 || index>=bits->GetSize()) {
+            throw std::out_of_range("BitSequence::SetBit: index out of range");
+        }
+        bits->Set(index, Bit(value));
+    }
+
 };

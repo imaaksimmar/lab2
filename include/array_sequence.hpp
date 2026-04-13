@@ -13,6 +13,13 @@ public:
     ArraySequence(T* items, int count) : array(new DynamicArray<T>(items, count)) {}
     ArraySequence(const ArraySequence<T>& other) : array(new DynamicArray<T>(*other.array)) {}
     
+    ArraySequence(const LinkedList<T>& list) 
+    : array(new DynamicArray<T>(list.GetLength())) {
+        for(int i=0; i<list.GetLength(); i++) {
+            array->Set(i, list.Get(i));
+        }
+    }
+    
     ~ArraySequence() {
         delete array;
     }
