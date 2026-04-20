@@ -6,7 +6,7 @@ PROGRAM = lab2
 SRC = src/main.cpp
 
 TEST_PROGRAM = run_tests
-TEST_SRC = tests/run_tests.cpp tests/test.cpp
+TEST_SRC = tests/run_tests.cpp tests/test.cpp tests/assert.cpp
 
 all: $(PROGRAM)
 

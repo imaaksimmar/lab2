@@ -1,7 +1,7 @@
 #pragma once
-#include <stdexcept>
 #include "sequence.hpp"
 #include "linked_list.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class ListSequence : public Sequence<T> {
@@ -9,6 +9,7 @@ private:
     LinkedList<T>* list;  
 public:
     ListSequence() : list(new LinkedList<T>()) {}
+    
     ListSequence(T* items, int count) 
     : list(new LinkedList<T>(items, count)) {}
 
@@ -18,9 +19,21 @@ public:
     ListSequence(const LinkedList<T>& sourceList) 
     : list(new LinkedList<T>(sourceList)) {}
 
-    ~ListSequence() {
-        delete list;  
+    ~ListSequence() { delete list; }
+
+    ListSequence<T>& operator=(const ListSequence<T>& other) {
+    if(this == &other) {
+        return *this;  
     }
+    delete list;                          
+    list = new LinkedList<T>(*other.list); 
+    return *this;
+    }
+
+    T& operator[](int index) {
+        return (*list)[index];  
+    }
+
 
     T GetFirst() const override { 
         return list->GetFirst();  
@@ -39,9 +52,9 @@ public:
     }
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
-        if (startIndex<0 || endIndex>=list->GetLength() || startIndex>endIndex) {
-            throw std::out_of_range("ListSequence::GetSubsequence: invalid indices");
-    }
+        if(startIndex < 0 || endIndex >= list->GetLength() || startIndex > endIndex) {
+            throw InvalidArgument();
+        }
         LinkedList<T>* subList = list->GetSubList(startIndex, endIndex);
         ListSequence<T>* result = new ListSequence<T>(*subList);
         delete subList; 
@@ -65,14 +78,13 @@ public:
 
     Sequence<T>* Concat(Sequence<T>* otherSequence) override {
         if(otherSequence == nullptr) {
-            throw std::invalid_argument("ListSequence::Concat: otherSequence is nullptr");
+            throw NullPointer();
         }
         for(int i=0; i<otherSequence->GetLength(); i++) {
             list->Append(otherSequence->Get(i));
         }
         return this;
     }
-
 
     Sequence<T>* Map(T (*func)(T)) const override {
         ListSequence<T>* result = new ListSequence<T>();
@@ -95,7 +107,7 @@ public:
     T Reduce(T (*func)(T, T), T initial) const override {
         T result = initial;
         for(int i=0; i<list->GetLength(); i++) {
-            result = func(result, list->Get(i));
+            result = func(result, list->Get(i));  
         }
         return result;
     }

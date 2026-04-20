@@ -1,27 +1,83 @@
-.PHONY: all run test clean
+#pragma once
 
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -I include -mmacosx-version-min=15.0
+void testDynamicArrayConstructors();
+void testDynamicArrayGet();
+void testDynamicArraySet();
+void testDynamicArrayResize();
+void testDynamicArrayExceptions();
 
-PROGRAM = lab2
-SRC = src/main.cpp
+void testLinkedListConstructors();
+void testLinkedListGetFirstLast();
+void testLinkedListGet();
+void testLinkedListAppendPrepend();
+void testLinkedListInsertAt();
+void testLinkedListGetSubList();
+void testLinkedListConcat();
+void testLinkedListExceptions();
 
-TEST_PROGRAM = run_tests
-TEST_SRC = tests/run_tests.cpp tests/test.cpp
+void testArraySequenceConstructors();
+void testArraySequenceGetFirstLast();
+void testArraySequenceGet();
+void testArraySequenceAppendPrepend();
+void testArraySequenceInsertAt();
+void testArraySequenceGetSubsequence();
+void testArraySequenceConcat();
+void testArraySequenceMap();
+void testArraySequenceWhere();
+void testArraySequenceReduce();
+void testArraySequenceExceptions();
 
-all: $(PROGRAM)
+void testListSequenceConstructors();
+void testListSequenceGetFirstLast();
+void testListSequenceGet();
+void testListSequenceAppendPrepend();
+void testListSequenceInsertAt();
+void testListSequenceGetSubsequence();
+void testListSequenceConcat();
+void testListSequenceMap();
+void testListSequenceWhere();
+void testListSequenceReduce();
+void testListSequenceExceptions();
 
-$(PROGRAM): $(SRC)
-	$(CXX) $(CXXFLAGS) $< -o $@
+void testImmutableArraySequenceConstructors();
+void testImmutableArraySequenceGetFirstLast();
+void testImmutableArraySequenceGet();
+void testImmutableArraySequenceAppendPrepend();
+void testImmutableArraySequenceInsertAt();
+void testImmutableArraySequenceGetSubsequence();
+void testImmutableArraySequenceConcat();
+void testImmutableArraySequenceMap();
+void testImmutableArraySequenceWhere();
+void testImmutableArraySequenceReduce();
+void testImmutableArraySequenceImmutability();
 
-test: $(TEST_PROGRAM)
-	./$(TEST_PROGRAM)
+void testImmutableListSequenceConstructors();
+void testImmutableListSequenceGetFirstLast();
+void testImmutableListSequenceGet();
+void testImmutableListSequenceAppendPrepend();
+void testImmutableListSequenceInsertAt();
+void testImmutableListSequenceGetSubsequence();
+void testImmutableListSequenceConcat();
+void testImmutableListSequenceMap();
+void testImmutableListSequenceWhere();
+void testImmutableListSequenceReduce();
+void testImmutableListSequenceImmutability();
 
-$(TEST_PROGRAM): $(TEST_SRC)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+void testBitSequenceConstructors();
+void testBitSequenceGetFirstLast();
+void testBitSequenceGet();
+void testBitSequenceAppendPrepend();
+void testBitSequenceInsertAt();
+void testBitSequenceGetSubsequence();
+void testBitSequenceConcat();
+void testBitSequenceMap();
+void testBitSequenceWhere();
+void testBitSequenceReduce();
+void testBitSequenceBitwiseOps();
+void testBitSequenceIsSet();
+void testBitSequenceExceptions();
 
-run: $(PROGRAM)
-	./$(PROGRAM)
-
-clean:
-	rm -f $(PROGRAM) $(TEST_PROGRAM)
+void testImmutableBitSequenceConstructors();
+void testImmutableBitSequenceBitwiseOps();
+void testImmutableBitSequenceImmutability();
+void testImmutableBitSequenceIsSet();

@@ -1,7 +1,7 @@
 #pragma once
-#include <stdexcept>
 #include "sequence.hpp"
 #include "linked_list.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class ImmutableListSequence : public Sequence<T> {
@@ -22,6 +22,15 @@ public:
         delete list;  
     }
 
+    ImmutableListSequence<T>& operator=(const ImmutableListSequence<T>& other) {
+        if(this == &other) {
+            return *this;
+        }
+        delete list;
+        list = new LinkedList<T>(*other.list);
+        return *this;
+    }
+
     T GetFirst() const override { 
         return list->GetFirst();  
     }
@@ -40,7 +49,7 @@ public:
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
         if(startIndex<0 || endIndex>=list->GetLength() || startIndex>endIndex) {
-            throw std::out_of_range("ListSequence::GetSubsequence: invalid indices");
+            throw InvalidArgument();
         }
         LinkedList<T>* subList = list->GetSubList(startIndex, endIndex);
         ImmutableListSequence<T>* result = new ImmutableListSequence<T>(*subList);
@@ -62,7 +71,7 @@ public:
 
     Sequence<T>* InsertAt(T item, int index) override {
         if(index<0 || index>list->GetLength()) {
-            throw std::out_of_range("ImmutableListSequence::InsertAt: index out of range");
+            throw IndexOutOfRange();
         }
         ImmutableListSequence<T>* copy = new ImmutableListSequence<T>(*this);
         copy->list->InsertAt(item, index);
@@ -71,7 +80,7 @@ public:
 
     Sequence<T>* Concat(Sequence<T>* otherSequence) override {
         if(otherSequence == nullptr) {
-            throw std::invalid_argument("ListSequence::Concat: otherSequence is nullptr");
+            throw NullPointer();
         }
         ImmutableListSequence<T>* copy = new ImmutableListSequence<T>(*this);
         for(int i=0; i<otherSequence->GetLength(); i++) {

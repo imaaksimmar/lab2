@@ -1,50 +1,67 @@
 #pragma once 
-#include <stdexcept> 
+#include "exceptions.hpp"
 
 
 template <typename T> 
 class DynamicArray {
 private:
     T* data;
-    int size; 
+    uint32_t size; // поменять 
     
 public:
     DynamicArray() : data(nullptr), size(0) {}
-    DynamicArray(T* items, int count) : data(nullptr), size(0)  { 
-        if(count < 0) {
-            throw std::invalid_argument("DynamicArray: size cannot be negative");
+
+    DynamicArray(uint32_t count) : data(nullptr), size(0) {
+        if(count < 0) {  
+            throw InvalidArgument();
         }
         size = count;
         data = new T[size];
+    }
+
+    DynamicArray(T* items, uint32_t count) : DynamicArray(count) {
+        if(count>0 && items==nullptr) {
+            throw InvalidArgument();
+        }
         for(int i=0; i<size; i++) {
             data[i] = items[i];
         }
     }
     
-    DynamicArray(int count) : data(nullptr), size(0) {
-        if(count < 0) {  
-            throw std::invalid_argument("DynamicArray: count cannot be negative");
-        }
-        size = count;
-        data = new T[size];
-    }
+    DynamicArray(const DynamicArray<T>& otherDynamicArray) 
+    : DynamicArray(otherDynamicArray.data, otherDynamicArray.size) {}
     
-    DynamicArray(const DynamicArray<T>& otherDynamicArray) : data(nullptr), size(0) {
-        size = otherDynamicArray.size;          
-        data = new T[size];         
-        for(int i=0; i<size; i++) {
-            data[i] = otherDynamicArray.data[i]; 
-        }
-    }
+    ~DynamicArray() { delete[] data; }
     
-    ~DynamicArray() {
+    DynamicArray<T>& operator=(const DynamicArray<T>& otherDynamicArray ) {
+        if(this == &otherDynamicArray) { return *this; }
+        
         delete[] data;
+        size = otherDynamicArray.size;
+        data = new T[size];
+        for(int i=0; i<size; i++) {
+            data[i] = otherDynamicArray.data[i];
+        }
+        return *this;
     }
     
+    T& operator[](int index) {
+        if(index<0 || index>=size) {
+            throw IndexOutOfRange();
+        }
+        return data[index];
+    }
+
+    const T& operator[](int index) const {
+        if(index < 0 || index >= size) { 
+            throw IndexOutOfRange();
+         }
+        return data[index];
+    }   
     
     T Get(int index) const { 
         if(index < 0 || index >= size) { 
-            throw std::out_of_range("DynamicArray::Get: index out of range");
+            throw IndexOutOfRange();
         }
         return data[index];
     }
@@ -55,14 +72,14 @@ public:
     
     void Set(int index, T value) {
         if(index < 0 || index >= size) {  
-            throw std::out_of_range("DynamicArray::Set: index out of range");
+            throw IndexOutOfRange();
         }
         data[index] = value;
     }
     
     void Resize(int newSize) {
         if(newSize < 0) {  
-            throw std::invalid_argument("DynamicArray::Resize: newSize cannot be negative");
+            throw InvalidArgument();
         }
         T* newData = new T[newSize];
         int copyLen = (newSize<size) ? newSize : size;  
@@ -75,4 +92,4 @@ public:
         data = newData; 
         size = newSize;  
     }
-};
+}; 

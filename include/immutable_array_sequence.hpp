@@ -1,8 +1,8 @@
 #pragma once
-#include <stdexcept>
 #include "sequence.hpp"
 #include "dynamic_array.hpp"
 #include "linked_list.hpp" 
+#include "exceptions.hpp"
 
 template <typename T>
 class ImmutableArraySequence : public Sequence<T> {
@@ -21,22 +21,29 @@ public:
         }
     }
 
-    ~ImmutableArraySequence() {
+    ~ImmutableArraySequence() { delete array; }
+
+    ImmutableArraySequence<T>& operator=(const ImmutableArraySequence<T>& other) {
+        if(this == &other) {
+            return *this;
+        }
         delete array;
+        array = new DynamicArray<T>(*other.array);
+        return *this;
     }
 
     T GetFirst() const override { 
-        if(array->GetSize() == 0) throw std::out_of_range("ImmutableArraySequence::GetFirst: empty");
+        if(array->GetSize() == 0) throw EmptyCollection();
         return array->Get(0);
     }
 
     T GetLast() const override {
-        if(array->GetSize() == 0) throw std::out_of_range("ImmutableArraySequence::GetLast: empty");
+        if(array->GetSize() == 0) throw EmptyCollection();
         return array->Get(array->GetSize()-1);
     }
 
     T Get(int index) const override {
-        if (index < 0 || index >= array->GetSize()) throw std::out_of_range("ImmutableArraySequence::Get: out of range");
+        if (index < 0 || index >= array->GetSize()) throw IndexOutOfRange();
         return array->Get(index);
     }
 
@@ -46,8 +53,8 @@ public:
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) const override {
         if(startIndex<0 || endIndex>=array->GetSize() || startIndex>endIndex)
-            throw std::out_of_range("ImmutableArraySequence::GetSubsequence: invalid indices");
-        
+            throw InvalidArgument();
+
         int subSize = endIndex - startIndex + 1;
         ImmutableArraySequence<T>* result = new ImmutableArraySequence<T>();
         result->array->Resize(subSize); 
@@ -106,7 +113,7 @@ public:
 
     Sequence<T>* InsertAt(T item, int index) override {
         if(index < 0 || index > array->GetSize())
-            throw std::out_of_range("ImmutableArraySequence::InsertAt: index out of range");
+            throw IndexOutOfRange();
         
         ImmutableArraySequence<T>* copy = new ImmutableArraySequence<T>(*this);
         int oldSize = copy->array->GetSize();
@@ -120,7 +127,7 @@ public:
 
     Sequence<T>* Concat(Sequence<T>* otherSequence) override {
         if(otherSequence == nullptr) {
-            throw std::invalid_argument("ImmutableArraySequence::Concat: nullptr");
+            throw NullPointer();
         }
         ImmutableArraySequence<T>* copy = new ImmutableArraySequence<T>(*this);
         int oldSize = copy->array->GetSize();

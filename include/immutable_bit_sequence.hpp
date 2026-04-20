@@ -1,9 +1,9 @@
 #pragma once
-#include <stdexcept>
 #include "sequence.hpp"
 #include "bit.hpp"
 #include "dynamic_array.hpp"
 #include "linked_list.hpp"
+#include "exceptions.hpp"
 
 class ImmutableBitSequence : public Sequence<Bit> {
 private:
@@ -21,25 +21,38 @@ public:
         }
     }
 
-    ~ImmutableBitSequence() {
-        delete bits;  
+    ~ImmutableBitSequence() { delete bits; }
+
+    ImmutableBitSequence& operator=(const ImmutableBitSequence& other) {
+        if(this == &other) {
+            return *this;
+        }
+        delete bits;
+        bits = new DynamicArray<Bit>(*other.bits);
+        return *this;
+    }
+
+    const Bit& operator[](int index) const {
+        if(index<0 || index>=bits->GetSize())
+            throw IndexOutOfRange();
+        return (*bits)[index];
     }
 
     Bit GetFirst() const override {
         if(bits->GetSize() == 0) 
-            throw std::out_of_range("ImmutableBitSequence::GetFirst: empty");
+            throw EmptyCollection();
         return bits->Get(0);
     }
 
     Bit GetLast() const override {
         if(bits->GetSize() == 0) 
-            throw std::out_of_range("ImmutableBitSequence::GetLast: empty");
+            throw EmptyCollection();
         return bits->Get(bits->GetSize()-1);
     }
 
     Bit Get(int index) const override {
         if(index<0 || index>=bits->GetSize()) {
-            throw std::out_of_range("ImmutableBitSequence::Get: index out of range");
+            throw IndexOutOfRange();
         }
         return bits->Get(index);
     }
@@ -50,7 +63,7 @@ public:
 
     Sequence<Bit>* GetSubsequence(int startIndex, int endIndex) const override {
         if(startIndex<0 || endIndex>=bits->GetSize() || startIndex>endIndex) {
-            throw std::out_of_range("ImmutableBitSequence::GetSubsequence: invalid indices");
+            throw InvalidArgument();
         }
         ImmutableBitSequence* result = new ImmutableBitSequence();
         int subSize = endIndex-startIndex+1;
@@ -83,7 +96,7 @@ public:
 
     Sequence<Bit>* InsertAt(Bit item, int index) override {
         if(index<0 || index>bits->GetSize()) {
-            throw std::out_of_range("ImmutableBitSequence::InsertAt: index out of range");
+            throw IndexOutOfRange();
         }
         ImmutableBitSequence* copy = new ImmutableBitSequence(*this);
         int oldSize = copy->bits->GetSize();
@@ -97,7 +110,7 @@ public:
 
     Sequence<Bit>* Concat(Sequence<Bit>* otherSequence) override {
         if(otherSequence == nullptr) {
-            throw std::invalid_argument("ImmutableBitSequence::Concat: otherSequence is nullptr");
+            throw NullPointer();
         }
         ImmutableBitSequence* copy = new ImmutableBitSequence(*this);
         int oldSize = copy->bits->GetSize();
@@ -139,7 +152,7 @@ public:
 
     ImmutableBitSequence And(const ImmutableBitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("ImmutableBitSequence::And: size mismatch");
+            throw SizeMismatch();
         }
         ImmutableBitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -151,7 +164,7 @@ public:
 
     ImmutableBitSequence Or(const ImmutableBitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("ImmutableBitSequence::Or: size mismatch");
+            throw SizeMismatch();
         }
         ImmutableBitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -163,7 +176,7 @@ public:
 
     ImmutableBitSequence Xor(const ImmutableBitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("ImmutableBitSequence::Xor: size mismatch");
+            throw SizeMismatch();
         }
         ImmutableBitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -187,55 +200,15 @@ public:
     }
 
     ImmutableBitSequence operator|(const ImmutableBitSequence& other) const {
-    return this->Or(other);
+        return this->Or(other);
     }   
 
     ImmutableBitSequence operator^(const ImmutableBitSequence& other) const {
         return this->Xor(other);
     }
 
-
     ImmutableBitSequence operator~() const {
         return this->Not();
     }
 
-    //
-    unsigned long long ToMask() const {
-        if(bits->GetSize() > 64) {
-            throw std::overflow_error("ImmutableBitSequence::ToMask: too many bits for 64-bit mask");
-        }
-        unsigned long long mask = 0;
-        for(int i = 0; i < bits->GetSize(); ++i) {
-            if(bits->Get(i).GetValue()) {
-                mask |= (1ULL << i);
-            }
-        }
-        return mask;
-    }
-
-    static ImmutableBitSequence* FromMask(unsigned long long mask, int bitCount = 64) {
-        ImmutableBitSequence* result = new ImmutableBitSequence();
-        result->bits->Resize(bitCount);
-        for(int i = 0; i < bitCount; ++i) {
-            bool bit = (mask >> i) & 1ULL;
-            result->bits->Set(i, Bit(bit));
-        }
-        return result;
-    }
-    //
-
-    bool IsSet(int index) const {
-        if(index < 0 || index >= bits->GetSize()) {
-            throw std::out_of_range("ImmutableBitSequence::IsSet: index out of range");
-        }
-        return bits->Get(index).GetValue();
-    }
-
-
-    void SetBit(int index, bool value) {
-            if (index<0 || index>=bits->GetSize()) {
-                throw std::out_of_range("BitSequence::SetBit: index out of range");
-            }
-            bits->Set(index, Bit(value));
-        }
 };

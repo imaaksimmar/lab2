@@ -1,9 +1,9 @@
 #pragma once
-#include <stdexcept>
 #include "sequence.hpp"
 #include "bit.hpp"
 #include "dynamic_array.hpp"
 #include "linked_list.hpp"
+#include "exceptions.hpp"
 
 class BitSequence : public Sequence<Bit> {
 private:
@@ -21,23 +21,45 @@ public:
         }
     }
 
-    ~BitSequence() {
+    ~BitSequence() { delete bits; }
+
+    BitSequence& operator=(const BitSequence& other) {
+        if(this == &other) {
+            return *this;
+        }
         delete bits;
+        bits = new DynamicArray<Bit>(*other.bits);
+        return *this;
+    }
+
+    Bit& operator[](int index) {
+        if(index<0 || index>=bits->GetSize()) {
+            throw IndexOutOfRange();
+        }
+        return (*bits)[index]; 
+    }
+
+    const Bit& operator[](int index) const {
+        if(index<0 || index>=bits->GetSize())
+            throw IndexOutOfRange();
+        return (*bits)[index];
     }
 
     Bit GetFirst() const override {
-        if(bits->GetSize() == 0) throw std::out_of_range("BitSequence::GetFirst: empty");
+        if(bits->GetSize() == 0) {
+            throw EmptyCollection();
+        }
         return bits->Get(0);
     }
 
     Bit GetLast() const override {
-        if(bits->GetSize() == 0) throw std::out_of_range("BitSequence::GetLast: empty");
+        if(bits->GetSize() == 0) throw EmptyCollection();
         return bits->Get(bits->GetSize() - 1);
     }
 
     Bit Get(int index) const override {
         if(index<0 || index>=bits->GetSize()) {
-            throw std::out_of_range("BitSequence::Get: index out of range");
+            throw IndexOutOfRange();
         }
         return bits->Get(index);
     }
@@ -48,7 +70,7 @@ public:
 
     Sequence<Bit>* GetSubsequence(int startIndex, int endIndex) const override {
         if(startIndex<0 || endIndex>=bits->GetSize() || startIndex>endIndex) {
-            throw std::out_of_range("BitSequence::GetSubsequence: invalid indices");
+            throw InvalidArgument();
         }
         BitSequence* result = new BitSequence();
         int subSize = endIndex-startIndex+1;
@@ -77,7 +99,7 @@ public:
 
     Sequence<Bit>* InsertAt(Bit item, int index) override {
         if(index<0 || index>bits->GetSize()) {
-            throw std::out_of_range("BitSequence::InsertAt: index out of range");
+            throw IndexOutOfRange();
         }
         int oldSize = bits->GetSize();
         bits->Resize(oldSize+1);
@@ -90,7 +112,7 @@ public:
 
     Sequence<Bit>* Concat(Sequence<Bit>* otherSequence) override {
         if (otherSequence == nullptr) {
-            throw std::invalid_argument("BitSequence::Concat: otherSequence is nullptr");
+            throw NullPointer();
         }
         int oldSize = bits->GetSize();
         int addSize = otherSequence->GetLength();
@@ -131,7 +153,7 @@ public:
 
     BitSequence And(const BitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("BitSequence::And: size does not match");
+            throw SizeMismatch();
         }
         BitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -143,7 +165,7 @@ public:
 
     BitSequence Or(const BitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("BitSequence::Or: size does not match");
+            throw SizeMismatch();
         }
         BitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -155,7 +177,7 @@ public:
 
     BitSequence Xor(const BitSequence& other) const {
         if(bits->GetSize() != other.bits->GetSize()) {
-            throw std::invalid_argument("BitSequence::Xor: size does not match");
+            throw SizeMismatch();
         }
         BitSequence result;
         result.bits->Resize(bits->GetSize());
@@ -190,45 +212,4 @@ public:
         return this->Not();
     }
     
-    //
-    unsigned long long ToMask() const {
-        if (bits->GetSize()>64) {
-            throw std::overflow_error("BitSequence::ToMask: too many bits for 64-bit mask");
-        }
-        unsigned long long mask = 0;
-        for (int i = 0; i < bits->GetSize(); ++i) {
-            if (bits->Get(i).GetValue()) {
-                mask |= (1ULL << i);
-            }
-        }
-        return mask;
-    }
-
-    static BitSequence* FromMask(unsigned long long mask, int bitCount = 64) {
-        BitSequence* result = new BitSequence();
-        result->bits->Resize(bitCount);
-        for (int i = 0; i < bitCount; ++i) {
-            bool bit = (mask >> i) & 1ULL;
-            result->bits->Set(i, Bit(bit));
-        }
-        return result;
-    }
-
-    bool IsSet(int index) const {
-        if(index<0 || index >= bits->GetSize()) {
-            throw std::out_of_range("BitSequence::IsSet: index out of range");
-        }
-        return bits->Get(index).GetValue();
-    }
-    //
-
-    // В public секции класса BitSequence:
-
-    void SetBit(int index, bool value) {
-        if (index<0 || index>=bits->GetSize()) {
-            throw std::out_of_range("BitSequence::SetBit: index out of range");
-        }
-        bits->Set(index, Bit(value));
-    }
-
 };

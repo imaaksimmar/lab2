@@ -1,6 +1,6 @@
 #pragma once 
 #include <iostream>
-#include <stdexcept>
+#include "exceptions.hpp"
 
 
 class Bit {
@@ -9,11 +9,12 @@ private:
 
 public:
     Bit() : value(false) {}
+    
     Bit(bool v) : value(v) {}
 
     Bit(int v) : value(v!=0) {
         if(v!=0 && v!=1) {
-            throw std::invalid_argument("Bit: only 0 or 1 is allowed");
+            throw InvalidArgument();
         }
     }
 
@@ -37,7 +38,5 @@ public:
     }
 
 };
-
-
 
 
