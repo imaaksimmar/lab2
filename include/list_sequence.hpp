@@ -86,29 +86,32 @@ public:
         return this;
     }
 
-    Sequence<T>* Map(T (*func)(T)) const override {
-        ListSequence<T>* result = new ListSequence<T>();
+    template <typename U>
+    ListSequence<U>* Map(U (*func)(T)) const {
+        ListSequence<U>* res = new ListSequence<U>();
         for(int i=0; i<list->GetLength(); i++) {
-            result->list->Append(func(list->Get(i)));
+            res->Append(func(list->Get(i)));
         }
-        return result;
+        return res;
     }
 
-    Sequence<T>* Where(bool (*predicate)(T)) const override {
-        ListSequence<T>* result = new ListSequence<T>();
+    ListSequence<T>* Where(bool (*predicate)(T)) const {
+        ListSequence<T>* res = new ListSequence<T>();
         for(int i=0; i<list->GetLength(); i++) {
             if(predicate(list->Get(i))) {
-                result->list->Append(list->Get(i));
+                res->Append(list->Get(i));
             }
         }
-        return result;
+        return res;
     }
 
-    T Reduce(T (*func)(T, T), T initial) const override {
-        T result = initial;
-        for(int i=0; i<list->GetLength(); i++) {
-            result = func(result, list->Get(i));  
+    template <typename U>
+    U Reduce(U (*func)(U, T), U initial) const {
+        U res = initial;
+        for(int i = 0; i < list->GetLength(); i++) {
+            res = func(res, list->Get(i));
         }
-        return result;
+        return res;
     }
+
 };

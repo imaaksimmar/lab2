@@ -14,9 +14,6 @@ class Sequence {
         virtual Sequence<T>* Prepend(T item) = 0;
         virtual Sequence<T>* InsertAt(T item, int index) = 0;
         virtual Sequence<T>* Concat(Sequence<T>* list) = 0;
-        virtual Sequence<T>* Map(T (*func)(T)) const = 0; // t->u
-        virtual Sequence<T>* Where(bool (*predicate)(T)) const = 0;
-        virtual T Reduce(T (*func)(T, T), T initial) const = 0;
         T operator[](int index) const { return Get(index); }
 };
 

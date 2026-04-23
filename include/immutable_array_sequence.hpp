@@ -64,39 +64,46 @@ public:
         return result;
     }
 
-    Sequence<T>* Map(T (*func)(T)) const override {
-        ImmutableArraySequence<T>* result = new ImmutableArraySequence<T>();
-        result->array->Resize(array->GetSize());
+    template <typename U>
+    ImmutableArraySequence<U>* Map(U (*func)(T)) const {
+        ImmutableArraySequence<U>* res = new ImmutableArraySequence<U>();
+        res->array->Resize(array->GetSize()); 
         for(int i=0; i<array->GetSize(); i++) {
-            result->array->Set(i, func(array->Get(i)));
+            res->array->Set(i, func(array->Get(i)));
         }
-        return result; 
+        return res;
     }
 
-    Sequence<T>* Where(bool (*predicate)(T)) const override {
-        ImmutableArraySequence<T>* result = new ImmutableArraySequence<T>();
-        for(int i=0; i<array->GetSize(); i++) {
-            if(predicate(array->Get(i))) {
-                result->array->Resize(result->array->GetSize()+1);
-                result->array->Set(result->array->GetSize()-1, array->Get(i));
-            }
-        }
-        return result;
+    ImmutableArraySequence<T>* Where(bool (*predicate)(T)) const {
+    int count = 0;
+    for(int i=0; i< array->GetSize(); i++) {
+        if(predicate(array->Get(i))) count++;
     }
-
-    T Reduce(T (*func)(T, T), T initial) const override {
-        T result = initial;
-        for(int i=0; i<array->GetSize(); i++) {
-            result = func(array->Get(i), result);
+    ImmutableArraySequence<T>* res = new ImmutableArraySequence<T>();
+    res->array->Resize(count);
+    int idx = 0;
+    for(int i=0; i<array->GetSize(); i++) {
+        if(predicate(array->Get(i))) {
+            res->array->Set(idx++, array->Get(i));
         }
-        return result;
     }
+    return res;
+}
 
+    template <typename U>
+    U Reduce(U (*func)(U, T), U initial) const {
+        U res = initial;
+        for(int i=0; i<array->GetSize(); i++) {
+            res = func(res, array->Get(i)); 
+        }
+        return res;
+    }
+    
     
     Sequence<T>* Append(T item) override {
         ImmutableArraySequence<T>* copy = new ImmutableArraySequence<T>(*this);
-        copy->array->Resize(copy->array->GetSize() + 1);
-        copy->array->Set(copy->array->GetSize() - 1, item);
+        copy->array->Resize(copy->array->GetSize()+ 1);
+        copy->array->Set(copy->array->GetSize()-1, item);
         return copy;
     }
 

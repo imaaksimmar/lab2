@@ -271,10 +271,13 @@ void testArraySequenceConcat() {
     assert(a.Get(3) == 4);
 }
 
+
 void testArraySequenceMap() {
     int items[] = {1, 2, 3};
     ArraySequence<int> a(items, 3);
-    Sequence<int>* mapped = a.Map([](int x) { return x * 2; });
+    
+    int (*doubleIt)(int) = [](int x) { return x * 2; };
+    Sequence<int>* mapped = a.Map<int>(doubleIt);
 
     assert(mapped->Get(0) == 2);
     assert(mapped->Get(1) == 4);
@@ -285,7 +288,10 @@ void testArraySequenceMap() {
 void testArraySequenceWhere() {
     int items[] = {1, 2, 3, 4, 5};
     ArraySequence<int> a(items, 5);
-    Sequence<int>* filtered = a.Where([](int x) { return x % 2 == 0; });
+    
+    bool (*isEven)(int) = [](int x) { return x % 2 == 0; };
+    Sequence<int>* filtered = a.Where(isEven);
+    
     assert(filtered->GetLength() == 2);
     assert(filtered->Get(0) == 2);
     assert(filtered->Get(1) == 4);
@@ -295,7 +301,10 @@ void testArraySequenceWhere() {
 void testArraySequenceReduce() {
     int items[] = {1, 2, 3};
     ArraySequence<int> a(items, 3);
-    int result = a.Reduce([](int acc, int x) { return acc + x; }, 0);
+   
+    int (*sumFunc)(int, int) = [](int acc, int x) { return acc + x; };
+    int result = a.Reduce<int>(sumFunc, 0);
+    
     assert(result == 6);
 }
 
@@ -409,27 +418,34 @@ void testListSequenceConcat() {
 void testListSequenceMap() {
     int items[] = {1, 2, 3};
     ListSequence<int> a(items, 3);
-    Sequence<int>* mapped = a.Map([](int x) { return x * 2; });
+    
+    int (*doubleIt)(int) = [](int x) { return x * 2; };
+    Sequence<int>* mapped = a.Map<int>(doubleIt);
 
     assert(mapped->Get(0) == 2);
+    assert(mapped->Get(1) == 4);
     assert(mapped->Get(2) == 6);
     delete mapped;
 }
 
 void testListSequenceWhere() {
-    int items[] = {1, 2, 3, 4};
-    ListSequence<int> a(items, 4);
-    Sequence<int>* filtered = a.Where([](int x) { return x % 2 == 0; });
-
+    int items[] = {1, 2, 3, 4, 5};
+    ListSequence<int> a(items, 5);
+    bool (*isEven)(int) = [](int x) { return x % 2 == 0; };
+    Sequence<int>* filtered = a.Where(isEven);
+    
     assert(filtered->GetLength() == 2);
     assert(filtered->Get(0) == 2);
+    assert(filtered->Get(1) == 4);
     delete filtered;
 }
 
 void testListSequenceReduce() {
     int items[] = {1, 2, 3};
     ListSequence<int> a(items, 3);
-    int result = a.Reduce([](int acc, int x) { return acc + x; }, 0);
+    
+    int (*sumFunc)(int, int) = [](int acc, int x) { return acc + x; };
+    int result = a.Reduce<int>(sumFunc, 0);
     assert(result == 6);
 }
 
@@ -533,29 +549,51 @@ void testImmutableArraySequenceConcat() {
     delete c;
 }
 
+
 void testImmutableArraySequenceMap() {
     int items[] = {1, 2, 3};
     ImmutableArraySequence<int> a(items, 3);
-    Sequence<int>* mapped = a.Map([](int x) { return x * 2; });
+    
+    int (*doubleIt)(int) = [](int x) { return x * 2; };
+    Sequence<int>* mapped = a.Map<int>(doubleIt);
+    
+    assert(a.Get(0) == 1);
+    assert(a.Get(2) == 3);
+    
     assert(mapped->Get(0) == 2);
+    assert(mapped->Get(1) == 4);
     assert(mapped->Get(2) == 6);
+    assert(mapped->GetLength() == 3);
+    
     delete mapped;
 }
 
 void testImmutableArraySequenceWhere() {
-    int items[] = {1, 2, 3, 4};
-    ImmutableArraySequence<int> a(items, 4);
-    Sequence<int>* filtered = a.Where([](int x) { return x % 2 == 0; });
+    int items[] = {1, 2, 3, 4, 5};
+    ImmutableArraySequence<int> a(items, 5);
+    
+    bool (*isEven)(int) = [](int x) { return x % 2 == 0; };
+    Sequence<int>* filtered = a.Where(isEven);
+    
+    assert(a.GetLength() == 5);
+    
     assert(filtered->GetLength() == 2);
+    assert(filtered->Get(0) == 2);
+    assert(filtered->Get(1) == 4);
+    
     delete filtered;
 }
 
 void testImmutableArraySequenceReduce() {
     int items[] = {1, 2, 3};
     ImmutableArraySequence<int> a(items, 3);
-    int result = a.Reduce([](int acc, int x) { return acc + x; }, 0);
+    
+    int (*sumFunc)(int, int) = [](int acc, int x) { return acc + x; };
+    int result = a.Reduce<int>(sumFunc, 0);
+    
     assert(result == 6);
 }
+
 
 void testImmutableArraySequenceImmutability() {
     int items[] = {1, 2, 3};
@@ -646,25 +684,48 @@ void testImmutableListSequenceConcat() {
 void testImmutableListSequenceMap() {
     int items[] = {1, 2, 3};
     ImmutableListSequence<int> a(items, 3);
-    Sequence<int>* mapped = a.Map([](int x) { return x * 2; });
+    
+    int (*doubleIt)(int) = [](int x) { return x * 2; };
+    Sequence<int>* mapped = a.Map<int>(doubleIt);
+    
+    assert(a.Get(0) == 1);
+    assert(a.Get(1) == 2);
+    assert(a.Get(2) == 3);
+    
+    assert(mapped->Get(0) == 2);
     assert(mapped->Get(1) == 4);
+    assert(mapped->Get(2) == 6);
+    assert(mapped->GetLength() == 3);
+    
     delete mapped;
 }
 
 void testImmutableListSequenceWhere() {
-    int items[] = {1, 2, 3, 4};
-    ImmutableListSequence<int> a(items, 4);
-    Sequence<int>* filtered = a.Where([](int x) { return x % 2 == 0; });
+    int items[] = {1, 2, 3, 4, 5};
+    ImmutableListSequence<int> a(items, 5);
+    
+    bool (*isEven)(int) = [](int x) { return x % 2 == 0; };
+    Sequence<int>* filtered = a.Where(isEven);
+    
+    assert(a.GetLength() == 5);
+    
     assert(filtered->GetLength() == 2);
+    assert(filtered->Get(0) == 2);
+    assert(filtered->Get(1) == 4);
+    
     delete filtered;
 }
 
 void testImmutableListSequenceReduce() {
     int items[] = {1, 2, 3};
     ImmutableListSequence<int> a(items, 3);
-    int result = a.Reduce([](int acc, int x) { return acc + x; }, 0);
+    
+    int (*sumFunc)(int, int) = [](int acc, int x) { return acc + x; };
+    int result = a.Reduce<int>(sumFunc, 0);
+    
     assert(result == 6);
 }
+
 
 void testImmutableListSequenceImmutability() {
     int items[] = {1, 2, 3};
@@ -678,136 +739,132 @@ void testImmutableListSequenceImmutability() {
 }
 
 
-
 void testBitSequenceConstructors() {
-    BitSequence empty;
+    BitSequence<> empty;
     assert(empty.GetLength() == 0);
-    Bit items[] = {Bit(1), Bit(0), Bit(1)};
-    BitSequence a(items, 3);
-
+    
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(0), Bit<unsigned char>(1)};
+    BitSequence<> a(items, 3);
     assert(a.GetLength() == 3);
-    assert(a.Get(0).GetValue() == true);
-    assert(a.Get(1).GetValue() == false);
-    BitSequence b(a);
+    assert(a.Get(0).GetValue() == 1);
+    assert(a.Get(1).GetValue() == 0);
+    
+    BitSequence<> b(a);
     assert(b.GetLength() == 3);
+    assert(b.Get(2).GetValue() == 1);
 }
 
 void testBitSequenceGetFirstLast() {
-    Bit items[] = {Bit(1), Bit(0), Bit(1)};
-    BitSequence a(items, 3);
-
-    assert(a.GetFirst().GetValue() == true);
-    assert(a.GetLast().GetValue() == true);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(5), Bit<unsigned char>(0), Bit<unsigned char>(3)};
+    BitSequence<> a(items, 3);
+    assert(a.GetFirst().GetValue() == 5);
+    assert(a.GetLast().GetValue() == 3);
 }
 
 void testBitSequenceGet() {
-    Bit items[] = {Bit(0), Bit(1), Bit(0)};
-    BitSequence a(items, 3);
-    assert(a.Get(1).GetValue() == true);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(10), Bit<unsigned char>(20), Bit<unsigned char>(30)};
+    BitSequence<> a(items, 3);
+    assert(a.Get(1).GetValue() == 20);
 }
 
 void testBitSequenceAppendPrepend() {
-    BitSequence a;
-    a.Append(Bit(1));
-    a.Append(Bit(0));
-
+    BitSequence<> a;
+    a.Append(Bit<unsigned char>(1));
+    a.Append(Bit<unsigned char>(2));
     assert(a.GetLength() == 2);
-    assert(a.GetFirst().GetValue() == true);
-    a.Prepend(Bit(0));
-    assert(a.GetFirst().GetValue() == false);
+    assert(a.GetFirst().GetValue() == 1);
+    
+    a.Prepend(Bit<unsigned char>(0));
     assert(a.GetLength() == 3);
+    assert(a.GetFirst().GetValue() == 0);
+    assert(a.Get(1).GetValue() == 1);
 }
 
 void testBitSequenceInsertAt() {
-    Bit items[] = {Bit(1), Bit(1)};
-    BitSequence a(items, 2);
-    a.InsertAt(Bit(0), 1);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(3)};
+    BitSequence<> a(items, 2);
+    a.InsertAt(Bit<unsigned char>(2), 1);
     assert(a.GetLength() == 3);
-    assert(a.Get(1).GetValue() == false);
+    assert(a.Get(1).GetValue() == 2);
 }
 
 void testBitSequenceGetSubsequence() {
-    Bit items[] = {Bit(1), Bit(0), Bit(1), Bit(0)};
-    BitSequence a(items, 4);
-    Sequence<Bit>* sub = a.GetSubsequence(1, 2);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(10), Bit<unsigned char>(20), Bit<unsigned char>(30), Bit<unsigned char>(40)};
+    BitSequence<> a(items, 4);
+    Sequence<Bit<unsigned char>>* sub = a.GetSubsequence(1, 2);
     assert(sub->GetLength() == 2);
-    assert(sub->Get(0).GetValue() == false);
+    assert(sub->Get(0).GetValue() == 20);
+    assert(sub->Get(1).GetValue() == 30);
     delete sub;
 }
 
 void testBitSequenceConcat() {
-    Bit a_items[] = {Bit(1), Bit(0)};
-    Bit b_items[] = {Bit(0), Bit(1)};
-    BitSequence a(a_items, 2);
-    BitSequence b(b_items, 2);
+    Bit<unsigned char> a_items[] = {Bit<unsigned char>(1), Bit<unsigned char>(2)};
+    Bit<unsigned char> b_items[] = {Bit<unsigned char>(3), Bit<unsigned char>(4)};
+    BitSequence<> a(a_items, 2);
+    BitSequence<> b(b_items, 2);
     a.Concat(&b);
     assert(a.GetLength() == 4);
-    assert(a.GetLast().GetValue() == true);
+    assert(a.Get(2).GetValue() == 3);
+    assert(a.GetLast().GetValue() == 4);
 }
 
-void testBitSequenceMap() {
-    Bit items[] = {Bit(1), Bit(0), Bit(1)};
-    BitSequence a(items, 3);
 
-    Sequence<Bit>* mapped = a.Map([](Bit b) { return ~b; });
-    assert(mapped->Get(0).GetValue() == false);
-    assert(mapped->Get(1).GetValue() == true);
-    delete mapped;
-}
 
 void testBitSequenceWhere() {
-    Bit items[] = {Bit(1), Bit(0), Bit(1), Bit(0)};
-    BitSequence a(items, 4);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(0), Bit<unsigned char>(5), Bit<unsigned char>(0)};
+    BitSequence<> a(items, 4);
 
-    Sequence<Bit>* ones = a.Where([](Bit b) { return b.GetValue(); });
-    assert(ones->GetLength() == 2);
-    delete ones;
+    bool (*isNonZero)(Bit<unsigned char>) = [](Bit<unsigned char> b) { return b.GetValue() != 0; };
+    Sequence<Bit<unsigned char>>* filtered = a.Where(isNonZero);
+
+    assert(filtered->GetLength() == 2);
+    assert(filtered->Get(0).GetValue() == 1);
+    assert(filtered->Get(1).GetValue() == 5);
+    delete filtered;
 }
 
 void testBitSequenceReduce() {
-    Bit items[] = {Bit(1), Bit(0), Bit(1)};
-    BitSequence a(items, 3);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(2), Bit<unsigned char>(4)};
+    BitSequence<> a(items, 3);
 
-    Bit result = a.Reduce([](Bit x, Bit acc) { return x | acc; }, Bit(0));
-    assert(result.GetValue() == true);
+    Bit<unsigned char> (*orAcc)(Bit<unsigned char>, Bit<unsigned char>) = [](Bit<unsigned char> acc, Bit<unsigned char> b) { return acc | b; };
+    Bit<unsigned char> result = a.Reduce<Bit<unsigned char>>(orAcc, Bit<unsigned char>(0));
+
+    assert(result.GetValue() == 7); 
 }
 
 void testBitSequenceBitwiseOps() {
-    Bit a_items[] = {Bit(1), Bit(0), Bit(1), Bit(0)};
-    Bit b_items[] = {Bit(1), Bit(1), Bit(0), Bit(0)};
+    Bit<unsigned char> a_items[] = {Bit<unsigned char>(0b1010), Bit<unsigned char>(0b1100)};
+    Bit<unsigned char> b_items[] = {Bit<unsigned char>(0b1001), Bit<unsigned char>(0b0101)};
+    BitSequence<> a(a_items, 2);
+    BitSequence<> b(b_items, 2);
 
-    BitSequence a(a_items, 4);
-    BitSequence b(b_items, 4);
+    BitSequence<> andRes = a & b;
+    assert(andRes.Get(0).GetValue() == 0b1000); 
+    assert(andRes.Get(1).GetValue() == 0b0100); 
 
-    BitSequence andRes = a & b;
-    assert(andRes.Get(0).GetValue() == true);
-    assert(andRes.Get(1).GetValue() == false);
-    assert(andRes.Get(2).GetValue() == false);
+    BitSequence<> orRes = a | b;
+    assert(orRes.Get(0).GetValue() == 0b1011);  
+    assert(orRes.Get(1).GetValue() == 0b1101);  
 
-    BitSequence orRes = a | b;
-    assert(orRes.Get(0).GetValue() == true);
-    assert(orRes.Get(1).GetValue() == true);
-    assert(orRes.Get(3).GetValue() == false);
+    BitSequence<> xorRes = a ^ b;
+    assert(xorRes.Get(0).GetValue() == 0b0011); 
+    assert(xorRes.Get(1).GetValue() == 0b1001); 
 
-    BitSequence xorRes = a ^ b;
-    assert(xorRes.Get(0).GetValue() == false);
-    assert(xorRes.Get(1).GetValue() == true);
-
-    BitSequence notRes = ~a;
-    assert(notRes.Get(0).GetValue() == false);
-    assert(notRes.Get(1).GetValue() == true);
+    BitSequence<> notRes = ~a;
+    assert(notRes.Get(0).GetValue() != a_items[0].GetValue());
+    assert(notRes.Get(1).GetValue() != a_items[1].GetValue());
 }
 
-
 void testBitSequenceExceptions() {
-    BitSequence empty;
+    BitSequence<> empty;
     bool caught = false;
-    
     try { empty.GetFirst(); } catch (const Exceptions&) { caught = true; }
     assert(caught);
 
-    Bit items[] = {Bit(1), Bit(0)};
-    BitSequence a(items, 2);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(0)};
+    BitSequence<> a(items, 2);
     
     caught = false;
     try { a.Get(-1); } catch (const Exceptions&) { caught = true; }
@@ -817,56 +874,82 @@ void testBitSequenceExceptions() {
     try { a.Concat(nullptr); } catch (const Exceptions&) { caught = true; }
     assert(caught);
 
-    Bit c_items[] = {Bit(1)};
-    BitSequence c(c_items, 1);
+    Bit<unsigned char> c_items[] = {Bit<unsigned char>(1)};
+    BitSequence<> c(c_items, 1);
     caught = false;
     try { a & c; } catch (const Exceptions&) { caught = true; }
     assert(caught);
 }
 
 
-
 void testImmutableBitSequenceConstructors() {
-    ImmutableBitSequence empty;
+    ImmutableBitSequence<> empty;
     assert(empty.GetLength() == 0);
-    Bit items[] = {Bit(1), Bit(0), Bit(1)};
-    ImmutableBitSequence a(items, 3);
     
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(0), Bit<unsigned char>(1)};
+    ImmutableBitSequence<> a(items, 3);
     assert(a.GetLength() == 3);
-    assert(a.Get(0).GetValue() == true);
-    ImmutableBitSequence b(a);
+    assert(a.Get(0).GetValue() == 1);
+    
+    ImmutableBitSequence<> b(a);
     assert(b.GetLength() == 3);
 }
 
+
+void testImmutableBitSequenceWhere() {
+    Bit<unsigned char> items[] = {Bit<unsigned char>(0), Bit<unsigned char>(3), Bit<unsigned char>(0), Bit<unsigned char>(7)};
+    ImmutableBitSequence<> a(items, 4);
+
+    bool (*isOdd)(Bit<unsigned char>) = [](Bit<unsigned char> b) { return b.GetValue() % 2 != 0; };
+    Sequence<Bit<unsigned char>>* filtered = a.Where(isOdd);
+
+    assert(filtered->GetLength() == 2);
+    assert(filtered->Get(0).GetValue() == 3);
+    assert(filtered->Get(1).GetValue() == 7);
+    
+    assert(a.GetLength() == 4); 
+    delete filtered;
+}
+
+void testImmutableBitSequenceReduce() {
+    Bit<unsigned char> items[] = {Bit<unsigned char>(1), Bit<unsigned char>(2), Bit<unsigned char>(4)};
+    ImmutableBitSequence<> a(items, 3);
+
+    int (*sumInt)(int, Bit<unsigned char>) = [](int acc, Bit<unsigned char> b) { return acc + b.GetValue(); };
+    int result = a.Reduce<int>(sumInt, 0);
+    assert(result == 7);
+}
+
 void testImmutableBitSequenceBitwiseOps() {
-    Bit a_items[] = {Bit(1), Bit(0)};
-    Bit b_items[] = {Bit(0), Bit(1)};
-    ImmutableBitSequence a(a_items, 2);
-    ImmutableBitSequence b(b_items, 2);
+    Bit<unsigned char> a_items[] = {Bit<unsigned char>(0b1010), Bit<unsigned char>(0b1100)};
+    Bit<unsigned char> b_items[] = {Bit<unsigned char>(0b1001), Bit<unsigned char>(0b0101)};
+    ImmutableBitSequence<> a(a_items, 2);
+    ImmutableBitSequence<> b(b_items, 2);
 
-    ImmutableBitSequence andRes = a & b;
-    assert(andRes.Get(0).GetValue() == false);
-    assert(andRes.Get(1).GetValue() == false);
+    ImmutableBitSequence<> andRes = a & b;
+    assert(andRes.Get(0).GetValue() == 0b1000);
+    assert(andRes.Get(1).GetValue() == 0b0100);
 
-    ImmutableBitSequence orRes = a | b;
-    assert(orRes.Get(0).GetValue() == true);
-    assert(orRes.Get(1).GetValue() == true);
+    ImmutableBitSequence<> orRes = a | b;
+    assert(orRes.Get(0).GetValue() == 0b1011);
+    assert(orRes.Get(1).GetValue() == 0b1101);
 
-    ImmutableBitSequence xorRes = a ^ b;
-    assert(xorRes.Get(0).GetValue() == true);
-    assert(xorRes.Get(1).GetValue() == true);
+    ImmutableBitSequence<> xorRes = a ^ b;
+    assert(xorRes.Get(0).GetValue() == 0b0011);
+    assert(xorRes.Get(1).GetValue() == 0b1001);
 
-    ImmutableBitSequence notRes = ~a;
-    assert(notRes.Get(0).GetValue() == false);
-    assert(notRes.Get(1).GetValue() == true);
+    ImmutableBitSequence<> notRes = ~a;
+    assert(notRes.Get(0).GetValue() != a_items[0].GetValue());
 }
 
 void testImmutableBitSequenceImmutability() {
-    Bit items[] = {Bit(1), Bit(0)};
-    ImmutableBitSequence a(items, 2);
+    Bit<unsigned char> items[] = {Bit<unsigned char>(10), Bit<unsigned char>(20)};
+    ImmutableBitSequence<> a(items, 2);
     int lenBefore = a.GetLength();
-    Sequence<Bit>* b = a.Append(Bit(1));
-    assert(a.GetLength() == lenBefore);
-    assert(b->GetLength() == lenBefore + 1);
-    delete b;
+    
+    Sequence<Bit<unsigned char>>* appended = a.Append(Bit<unsigned char>(30));
+    assert(a.GetLength() == lenBefore);        
+    assert(appended->GetLength() == lenBefore + 1);
+    assert(appended->Get(2).GetValue() == 30);
+    delete appended;
 }

@@ -1,25 +1,25 @@
 #pragma once 
 #include "exceptions.hpp"
 
-
 template <typename T> 
 class DynamicArray {
 private:
     T* data;
-    uint32_t size; // поменять 
+    int size;
     
 public:
+// методы ()
     DynamicArray() : data(nullptr), size(0) {}
 
-    DynamicArray(uint32_t count) : data(nullptr), size(0) {
-        if(count < 0) {  
+    DynamicArray(int count) : data(nullptr), size(0) {
+        if(count<0) {  
             throw InvalidArgument();
         }
         size = count;
         data = new T[size];
     }
 
-    DynamicArray(T* items, uint32_t count) : DynamicArray(count) {
+    DynamicArray(T* items, int count) : DynamicArray(count) {
         if(count>0 && items==nullptr) {
             throw InvalidArgument();
         }

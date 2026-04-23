@@ -2,12 +2,7 @@
 #include "sequence.hpp"
 #include "dynamic_array.hpp"
 #include "linked_list.hpp"
-#include "exceptions.hpp"
-
-// бит, в тестах поправить, интерфейс, мап 
-// uint_8 хранить на базе чаров 
-// [108] = d[3][12]
-// DynamicArray<Bit Pack<int>> d;  вложенность битов над чарами 
+#include "exceptions.hpp" 
 
 
 template <typename T>
@@ -114,31 +109,34 @@ public:
         return this;
     }
 
-    Sequence<T>* Map(T (*func)(T)) const override {
-        ArraySequence<T>* result = new ArraySequence<T>();
+    template <typename U>
+    ArraySequence<U>* Map(U (*func)(T)) const {
+        ArraySequence<U>* res = new ArraySequence<U>();
+        res->array->Resize(array->GetSize()); 
         for(int i=0; i<array->GetSize(); i++) {
-            result->Append(func(array->Get(i)));
+            res->array->Set(i, func(array->Get(i))); 
         }
-        return result; 
+        return res;
     }
 
-    Sequence<T>* Where(bool (*predicate)(T)) const override {
-        ArraySequence<T>* result = new ArraySequence<T>();
+    ArraySequence<T>* Where(bool (*predicate)(T)) const {
+        ArraySequence<T>* res = new ArraySequence<T>();
         for(int i=0; i<array->GetSize(); i++) {
-            T item = array->Get(i);
-            if(predicate(item)) {
-                result->Append(item);
+            if(predicate(array->Get(i))) {
+                res->Append(array->Get(i));
             }
         }
-        return result;
+        return res;
     }
 
-    T Reduce(T (*func)(T, T), T initial) const override {
-        T result = initial;
+    template <typename U>
+    U Reduce(U (*func)(U, T), U initial) const {
+        U res = initial;
         for(int i=0; i<array->GetSize(); i++) {
-            result = func(result, array->Get(i));      
+            res = func(res, array->Get(i));
         }
-        return result;
+        return res;
     }
+
 };
 

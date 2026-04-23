@@ -46,7 +46,7 @@ int main() {
     testListSequenceReduce(); std::cout << "testListSequenceReduce\n";
     testListSequenceExceptions(); std::cout << "testListSequenceExceptions\n";
 
-    // ImmutableArraySequence
+
     testImmutableArraySequenceConstructors(); std::cout << "testImmutableArraySequenceConstructors\n";
     testImmutableArraySequenceGetFirstLast(); std::cout << "testImmutableArraySequenceGetFirstLast\n";
     testImmutableArraySequenceGet(); std::cout << "testImmutableArraySequenceGet\n";
@@ -72,7 +72,7 @@ int main() {
     testImmutableListSequenceReduce(); std::cout << "testImmutableListSequenceReduce\n";
     testImmutableListSequenceImmutability(); std::cout << "testImmutableListSequenceImmutability\n";
 
-  
+    
     testBitSequenceConstructors(); std::cout << "testBitSequenceConstructors\n";
     testBitSequenceGetFirstLast(); std::cout << "testBitSequenceGetFirstLast\n";
     testBitSequenceGet(); std::cout << "testBitSequenceGet\n";
@@ -80,17 +80,15 @@ int main() {
     testBitSequenceInsertAt(); std::cout << "testBitSequenceInsertAt\n";
     testBitSequenceGetSubsequence(); std::cout << "testBitSequenceGetSubsequence\n";
     testBitSequenceConcat(); std::cout << "testBitSequenceConcat\n";
-    testBitSequenceMap(); std::cout << "testBitSequenceMap\n";
     testBitSequenceWhere(); std::cout << "testBitSequenceWhere\n";
     testBitSequenceReduce(); std::cout << "testBitSequenceReduce\n";
     testBitSequenceBitwiseOps(); std::cout << "testBitSequenceBitwiseOps\n";
     testBitSequenceExceptions(); std::cout << "testBitSequenceExceptions\n";
-
-    
     testImmutableBitSequenceConstructors(); std::cout << "testImmutableBitSequenceConstructors\n";
     testImmutableBitSequenceBitwiseOps(); std::cout << "testImmutableBitSequenceBitwiseOps\n";
     testImmutableBitSequenceImmutability(); std::cout << "testImmutableBitSequenceImmutability\n";
-
+    
+   
     std::cout << "\nИТОГИ:\n";
     std::cout << "Успешно: " << getTrueTests() << "\n";
     std::cout << "Ошибок:  " << getFailedTests() << "\n";

@@ -1,6 +1,6 @@
 .PHONY: all run test clean
 
-CXXFLAGS = -std=c++17 -Wall -I include -mmacosx-version-min=15.0
+CXXFLAGS = -std=c++20 -Wall -I include -mmacosx-version-min=15.0
 
 PROGRAM = lab2
 SRC = src/main.cpp

@@ -89,30 +89,32 @@ public:
         return copy;
     }
 
-    Sequence<T>* Map(T (*func)(T)) const override {
-    ImmutableListSequence<T>* result = new ImmutableListSequence<T>();
-    for(int i= 0; i<list->GetLength(); i++) {
-        result->list->Append(func(list->Get(i))); 
-    }
-    return result; 
+    template <typename U>
+    ImmutableListSequence<U>* Map(U (*func)(T)) const {
+        ImmutableListSequence<U>* res = new ImmutableListSequence<U>();
+        for(int i=0; i< list->GetLength(); i++) {
+            res->list->Append(func(list->Get(i)));
+        }
+        return res;
     }
 
-    Sequence<T>* Where(bool (*predicate)(T)) const override {
-        ImmutableListSequence<T>* result = new ImmutableListSequence<T>();
-        for(int i=0; i<list->GetLength(); i++) {
+    ImmutableListSequence<T>* Where(bool (*predicate)(T)) const {
+        ImmutableListSequence<T>* res = new ImmutableListSequence<T>();
+        for(int i=0; i <list->GetLength(); i++) {
             if(predicate(list->Get(i))) {
-                result->list->Append(list->Get(i));
+                res->list->Append(list->Get(i));
             }
         }
-        return result;
+        return res;
     }
 
-    T Reduce(T (*func)(T, T), T initial) const override {
-        T result = initial;
+    template <typename U>
+    U Reduce(U (*func)(U, T), U initial) const {
+        U res = initial;
         for(int i=0; i<list->GetLength(); i++) {
-            result = func(result, list->Get(i));      
+            res = func(res, list->Get(i));
         }
-        return result;
+        return res;
     }
 
 };
